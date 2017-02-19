@@ -36,13 +36,13 @@ def constraint_propogation(domain_dict,list_sud):
             if len(value)==1:
                 check = False
                 list_sud[key[0],key[1]]= value[0]
-                print key, value
+                #print key, value
                 del domain_dict[key]
                 break
-        print len(domain_dict)
+        #print len(domain_dict)
         #print key
         #print value
-        print print_sudoku(list_sud)
+        #print print_sudoku(list_sud)
         domain_dict=update_domain(domain_dict,list_sud)
 
         if check:
@@ -51,6 +51,11 @@ def constraint_propogation(domain_dict,list_sud):
 
             else:
                 return solve_sudoku(list(list_sud))
+
+
+
+
+
 
 
 
@@ -191,17 +196,14 @@ if __name__ == "__main__":
                 if line!='\n':
                     temp_data += [map(int,list(line[:-1]))]
 
-
-
-
     del data_dict[0]
 
     for key in data_dict.keys():
         if key in [27]:
             continue
+
         domain_dict={}
         sud_array =data_dict[key]
 
-        #constraint_propogation({},sud_array)
-        print key,solve_sudoku(sud_array)
+        print key,constraint_propogation({},sud_array)
         print_sudoku(data_dict[key])
