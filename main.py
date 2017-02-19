@@ -1,3 +1,4 @@
+#!/usr/bin/python
 
 def print_sudoku(list_sud):
     for i in range(9):
@@ -57,8 +58,9 @@ def used_in_box(list_sud, row, col, num):
 def check_location_is_safe(list_sud, row, col, num):
     # Check if 'num' is not already placed in current row,
     # current column and current 3x3 box
-    return not used_in_row(list_sud, row, num) and not used_in_col(list_sud, col, num) and not used_in_box(list_sud, row - row % 3,
-                                                                                                 col - col % 3, num)
+    return not used_in_row(list_sud, row, num) \
+        and not used_in_col(list_sud, col, num)\
+	and not used_in_box(list_sud, row - row % 3, col - col % 3, num)
 
 
 def solve_sudoku(list_sud):
