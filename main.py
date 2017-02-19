@@ -1,9 +1,15 @@
 
 def print_sudoku(list_sud):
     for i in range(9):
+        if i%3==0:
+            print '-----------------------\n',
         for j in range(9):
+            if j%3==0:
+                print '|',
             print list_sud[i][j],
-        print ('\n')
+        print
+
+    print '-----------------------\n'
 
 
 
@@ -111,6 +117,6 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in data_dict:
+    for key in [1,2,3,4]:
         print key,solve_sudoku(data_dict[key])
-        print print_sudoku(data_dict[key])
+        print_sudoku(data_dict[key])
