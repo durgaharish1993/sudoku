@@ -185,9 +185,10 @@ def load_puzzles(filename):
         temp_data = []
         for line in lines:
             if 'easy' in line or 'medium' in line or 'hard' in line  or 'evil' in line:
-                data_dict[count]=np.array(temp_data)
-                count+=1
-                temp_data=[]
+                if(temp_data):
+                    data_dict[count]=np.array(temp_data)
+                    count+=1
+                    temp_data=[]
                 continue
             else:
                 if line!='\n':
@@ -200,8 +201,6 @@ def load_puzzles(filename):
 # Driver main function to test above functions
 if __name__ == "__main__":
     data_dict = load_puzzles('evenMoreConsistent.txt')
-
-    del data_dict[0]
 
     for key in data_dict.keys():
         if key in [27]:
