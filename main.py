@@ -16,88 +16,122 @@ def print_sudoku(list_sud):
 
 
 
+def show_domain(domain_dict):
+    for i in range(9):
+        if i%3==0:
+            print '--------------------------------------------------------------------------------------------------------------------\n\n',
+        for j in range(9):
+            if j%3==0:
+                print '|',
+            if (i,j) in domain_dict:
+                a=''.join(map(str,domain_dict[i,j]))
+                print a + ' '*(9-len(a)),
+            else:
+                print 'f'+' '*8,
+        print
+
+    print '--------------------------------------------------------------------------------------------------------------------\n\n'
+
+
+
+
+def finding_coordinates(set_values,k):
+    final_dict_values = defaultdict(list)
+    for key in sorted(set_values.items(), key=lambda t: -len(t[0])):
+        if len(key[0]) == k:
+            final_dict_values[key[0]] += set_values[key[0]]
+        else:
+            for key1 in final_dict_values:
+                if key[0].issubset(key1):
+                    final_dict_values[key1] += set_values[key[0]]
+
+    return final_dict_values
+
+
+
+
+def remove_domains(indicator,i,j,key,coordinates,domain_dict):
+    check_list=[]
+    if indicator=='r':
+        check_list = [key for key in domain_dict if i==key[0]]
+    if indicator=='c':
+        check_list = [key for key in domain_dict if j==key[1]]
+    if indicator=='b':
+        for i1 in range(i,i+3):
+            for j1 in range(j,j+3):
+                check_list = [ key for key in domain_dict if key==(i1,j1)]
+
+    for cor in check_list:
+        if cor not in coordinates:
+            domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
+
+
+
+
+
+
+
+
+
+
+
+
+
 def naked_triples(domain_dict,list_sud,k):
 
-    #column unit
+    #row unit
+
     if domain_dict=={}:
         domain_dict = update_domain(domain_dict,list_sud)
+    show_domain(domain_dict)
     for i in range(9):
         set_values = defaultdict(list)
-        final_dict_values = defaultdict(list)
-
         for j in range(9):
             if (i,j) in domain_dict:
                 if len(domain_dict[i,j])<=k:
                     set_values[frozenset(domain_dict[i, j])] += [[i, j]]
 
-        for key in sorted(set_values.items(),key = lambda t: -len(t[0])):
-            if len(key[0])==k:
-                final_dict_values[key[0]]+=set_values[key[0]]
-            else:
-                for key1 in final_dict_values:
-                    if key[0].issubset(key1):
-                        final_dict_values[key1]+=set_values[key[0]]
+        final_dict_values = finding_coordinates(set_values,k)
 
         for key in final_dict_values:
             if len(final_dict_values[key])==k:
+                remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
                 return (key,final_dict_values[key])
 
-    #row unit
+
+
+
+    #column unit
     for j in range(9):
         set_values = defaultdict(list)
-        final_dict_values = defaultdict(list)
+
 
         for i in range(9):
             if (i,j) in domain_dict:
                 if len(domain_dict[i,j])<=k:
                     set_values[frozenset(domain_dict[i, j])] += [[i, j]]
 
-        for key in sorted(set_values.items(),key = lambda t: -len(t[0])):
-            if len(key[0])==k:
-                final_dict_values[key[0]]+=set_values[key[0]]
-            else:
-                for key1 in final_dict_values:
-                    if key[0].issubset(key1):
-                        final_dict_values[key1]+=set_values[key[0]]
-
+        final_dict_values = finding_coordinates(set_values,k)
         for key in final_dict_values:
-            if len(final_dict_values[key])==k:
-                return (key,final_dict_values[key])
+            if len(final_dict_values[key]) == k:
+                remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
+                return (key, final_dict_values[key])
 
 
-
-
-
-
-
-
-    #return set_values
-
-
-    #
-
-
-
+    #box unit
     for i in [0,3,6]:
         for j in [0,3,6]:
             set_values = defaultdict(list)
-            final_dict_values = defaultdict(list)
             for i1 in range(i,i+3):
                 for j1 in range(j,j+3):
                     if (i1, j1) in domain_dict:
                         if len(domain_dict[i1, j1]) <= k:
                             set_values[frozenset(domain_dict[i1, j1])] += [[i1, j1]]
 
-            for key in sorted(set_values.items(), key=lambda t: -len(t[0])):
-                if len(key[0]) == k:
-                    final_dict_values[key[0]] += set_values[key[0]]
-                else:
-                    for key1 in final_dict_values:
-                        if key[0].issubset(key1):
-                            final_dict_values[key1] += set_values[key[0]]
-
+            final_dict_values=finding_coordinates(set_values,k)
             for key in final_dict_values:
                 if len(final_dict_values[key]) == k:
+                    remove_domains('b', i, j, key, final_dict_values[key], domain_dict)
                     return (key, final_dict_values[key])
 
 
@@ -294,6 +328,8 @@ if __name__ == "__main__":
         domain_dict={}
         #domain_dict[0,0]=[1,2,3,4]
         sud_array =data_dict[key]
+
         print naked_triples(domain_dict,sud_array,3)
+        show_domain(domain_dict)
         #print key,constraint_propogation(domain_dict,sud_array)
         #print_sudoku(data_dict[key])
