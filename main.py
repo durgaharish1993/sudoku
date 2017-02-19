@@ -63,37 +63,26 @@ def constraint_propogation(domain_dict,list_sud):
 
 
 def find_domain(l,list_sud):
+    #Find index ranges of the box we are in
+    x = l[0]
+    y = l[1]
+    x1 = int(x/3)*3
+    x2 = x1+3
+    y1 = int(y/3)*3
+    y2 = y1+3
 
-    x = l[0]; y = l[1]
+    initial_range = set(range(10))
+    rowVals = set(list_sud[x,:])
+    colVals = set(list_sud[:,y])
+    boxVals = set(np.unique(list_sud[x1:x2,y1:y2]))
 
-    if x/3==0:
-        x1=0 ; x2 = 3
-    if x/3 == 1 :
-        x1 = 3 ; x2 = 6
-    if x/3 ==2 :
-        x1 = 6 ; x2 =9
-    if y/3==0:
-        y1=0 ; y2 = 3
-    if y/3 == 1 :
-        y1 = 3 ; y2 = 6
-    if y/3 ==2 :
-        y1 = 6 ; y2 =9
-
-    temp = set(range(10)).difference(set(list_sud[:,y]) | \
-               set(list_sud[x,:]) | \
-	       set(np.unique(list_sud[x1:x2,y1:y2])) )
+    # Restrict the initial set based on values that appear in variables that share a constraint
+    result_set = initial_range.difference(colVals | rowVals | boxVals)
     
-    return list(temp)
+    return list(result_set)
 
 
-
-
-
-
-
-
-
-
+#FIXME this needs to be made more flexible (choose variables with small domains)
 def find_empty_location(list_sud, l):
     for row in range(9):
         for col in range(9):
