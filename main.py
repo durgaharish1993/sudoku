@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import numpy as np
-
+from collections import defaultdict
 
 def print_sudoku(list_sud):
     for i in range(9):
@@ -13,6 +13,85 @@ def print_sudoku(list_sud):
         print
 
     print '-----------------------\n'
+
+
+
+def naked_triples(domain_dict,list_sud,k):
+
+    #column unit
+    if domain_dict=={}:
+        domain_dict = update_domain(domain_dict,list_sud)
+    for i in range(9):
+        set_values = defaultdict(list)
+        final_dict_values = defaultdict(list)
+
+        for j in range(9):
+            if (i,j) in domain_dict:
+                if len(domain_dict[i,j])<=k:
+                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
+
+        for key in sorted(set_values.items(),key = lambda t: -len(t[0])):
+            if len(key[0])==k:
+                final_dict_values[key[0]]+=set_values[key[0]]
+            else:
+                for key1 in final_dict_values:
+                    if key[0].issubset(key1):
+                        final_dict_values[key1]+=set_values[key[0]]
+
+        for key in final_dict_values:
+            if len(final_dict_values[key])==k:
+                return (key,final_dict_values[key])
+
+    #row unit
+    for j in range(9):
+        set_values = defaultdict(list)
+        final_dict_values = defaultdict(list)
+
+        for i in range(9):
+            if (i,j) in domain_dict:
+                if len(domain_dict[i,j])<=k:
+                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
+
+        for key in sorted(set_values.items(),key = lambda t: -len(t[0])):
+            if len(key[0])==k:
+                final_dict_values[key[0]]+=set_values[key[0]]
+            else:
+                for key1 in final_dict_values:
+                    if key[0].issubset(key1):
+                        final_dict_values[key1]+=set_values[key[0]]
+
+        for key in final_dict_values:
+            if len(final_dict_values[key])==k:
+                return (key,final_dict_values[key])
+
+
+
+
+
+
+
+
+    #return set_values
+
+
+    #
+
+
+
+
+
+
+
+
+
+
+
+
+
+#def naked_ripples(domain_dict,list_sud,k):
+
+
+
 
 
 
@@ -40,9 +119,9 @@ def constraint_propogation(domain_dict,list_sud):
                 del domain_dict[key]
                 break
         #print len(domain_dict)
-        #print key
+        print key
         #print value
-        #print print_sudoku(list_sud)
+        print print_sudoku(list_sud)
         domain_dict=update_domain(domain_dict,list_sud)
 
         if check:
@@ -51,9 +130,6 @@ def constraint_propogation(domain_dict,list_sud):
 
             else:
                 return solve_sudoku(list(list_sud))
-
-
-
 
 
 
@@ -79,7 +155,7 @@ def find_domain(l,list_sud):
     if y/3 ==2 :
         y1 = 6 ; y2 =9
 
-    temp = set(range(10)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])) )
+    temp = set(range(10)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])  ) )
     return list(temp)
 
 
@@ -198,12 +274,13 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in data_dict.keys():
+    for key in [1]:
         if key in [27]:
             continue
 
         domain_dict={}
+        #domain_dict[0,0]=[1,2,3,4]
         sud_array =data_dict[key]
-
-        print key,constraint_propogation({},sud_array)
-        print_sudoku(data_dict[key])
+        print find_squares(domain_dict,sud_array,3)
+        #print key,constraint_propogation(domain_dict,sud_array)
+        #print_sudoku(data_dict[key])
