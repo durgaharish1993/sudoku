@@ -53,16 +53,16 @@ def finding_coordinates(set_values,k):
 def remove_domains(indicator,i,j,key,coordinates,domain_dict):
     check_list=[]
     if indicator=='r':
-        check_list = [key for key in domain_dict if i==key[0]]
+        check_list = [key2 for key2 in domain_dict if i==key2[0]]
     if indicator=='c':
-        check_list = [key for key in domain_dict if j==key[1]]
+        check_list = [key2 for key2 in domain_dict if j==key2[1]]
     if indicator=='b':
         for i1 in range(i,i+3):
             for j1 in range(j,j+3):
-                check_list = [ key for key in domain_dict if key==(i1,j1)]
+                check_list = [ key2 for key2 in domain_dict if key2==(i1,j1)]
 
     for cor in check_list:
-        if cor not in coordinates:
+        if list(cor) not in coordinates:
             domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
 
 
@@ -83,6 +83,7 @@ def naked_triples(domain_dict,list_sud,k):
 
     if domain_dict=={}:
         domain_dict = update_domain(domain_dict,list_sud)
+
     show_domain(domain_dict)
     for i in range(9):
         set_values = defaultdict(list)
@@ -95,6 +96,7 @@ def naked_triples(domain_dict,list_sud,k):
 
         for key in final_dict_values:
             if len(final_dict_values[key])==k:
+
                 remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
                 return (key,final_dict_values[key])
 
@@ -331,5 +333,6 @@ if __name__ == "__main__":
 
         print naked_triples(domain_dict,sud_array,3)
         show_domain(domain_dict)
+        #print 'mdfdfdf',domain_dict[(1,1)]
         #print key,constraint_propogation(domain_dict,sud_array)
         #print_sudoku(data_dict[key])
