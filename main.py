@@ -78,17 +78,30 @@ def naked_triples(domain_dict,list_sud,k):
 
 
 
+    for i in [0,3,6]:
+        for j in [0,3,6]:
+            set_values = defaultdict(list)
+            final_dict_values = defaultdict(list)
+            for i1 in range(i,i+3):
+                for j1 in range(j,j+3):
+                    if (i1, j1) in domain_dict:
+                        if len(domain_dict[i1, j1]) <= k:
+                            set_values[frozenset(domain_dict[i1, j1])] += [[i1, j1]]
+
+            for key in sorted(set_values.items(), key=lambda t: -len(t[0])):
+                if len(key[0]) == k:
+                    final_dict_values[key[0]] += set_values[key[0]]
+                else:
+                    for key1 in final_dict_values:
+                        if key[0].issubset(key1):
+                            final_dict_values[key1] += set_values[key[0]]
+
+            for key in final_dict_values:
+                if len(final_dict_values[key]) == k:
+                    return (key, final_dict_values[key])
 
 
 
-
-
-
-
-
-
-
-#def naked_ripples(domain_dict,list_sud,k):
 
 
 
@@ -281,6 +294,6 @@ if __name__ == "__main__":
         domain_dict={}
         #domain_dict[0,0]=[1,2,3,4]
         sud_array =data_dict[key]
-        print find_squares(domain_dict,sud_array,3)
+        print naked_triples(domain_dict,sud_array,3)
         #print key,constraint_propogation(domain_dict,sud_array)
         #print_sudoku(data_dict[key])
