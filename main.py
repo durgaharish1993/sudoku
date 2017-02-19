@@ -23,22 +23,32 @@ def find_domain(l,list_sud):
 
     x = l[0]; y = l[1]
 
-    if x/3==1:
+    if x/3==0:
         x1=0 ; x2 = 3
-    if x/3 == 2 :
+    if x/3 == 1 :
         x1 = 3 ; x2 = 6
-    if x/3 ==3 :
+    if x/3 ==2 :
         x1 = 6 ; x2 =9
-    if y/3==1:
+    if y/3==0:
         y1=0 ; y2 = 3
-    if y/3 == 2 :
+    if y/3 == 1 :
         y1 = 3 ; y2 = 6
-    if y/3 ==3 :
+    if y/3 ==2 :
         y1 = 6 ; y2 =9
 
-        return list(set(list_sud[:,y]) & set(list_sud[x,:]) & set(np.unique(list_sud[x1:x2,y1:y2])) )
+    temp = set(range(9)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])) )
+    return list(temp)
 
 
+# 240300000
+# 000520407
+# 000046008
+# 610700084
+# 009060500
+# 730005061
+# 100470000
+# 302051000
+# 000002019
 
 
 
@@ -159,5 +169,6 @@ if __name__ == "__main__":
                     domain_dict[i,j] = [sud_array[i,j]]
 
         print domain_dict
-        print key,solve_sudoku(data_dict[key])
+        print sud_array
+        #print key,solve_sudoku(data_dict[key])
         print_sudoku(data_dict[key])
