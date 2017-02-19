@@ -79,7 +79,10 @@ def find_domain(l,list_sud):
     if y/3 ==2 :
         y1 = 6 ; y2 =9
 
-    temp = set(range(10)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])) )
+    temp = set(range(10)).difference(set(list_sud[:,y]) | \
+               set(list_sud[x,:]) | \
+	       set(np.unique(list_sud[x1:x2,y1:y2])) )
+    
     return list(temp)
 
 
@@ -174,17 +177,11 @@ def solve_sudoku(list_sud):
 
 
 
-
-
-
-# Driver main function to test above functions
-if __name__ == "__main__":
-
-
-    with open('evenMoreConsistent.txt','rb') as fp:
+def load_puzzles(filename):
+    with open(filename,'rb') as fp:
         lines=fp.readlines()
         data_dict = {}
-        count=0
+        count = 0
         temp_data = []
         for line in lines:
             if 'easy' in line or 'medium' in line or 'hard' in line  or 'evil' in line:
@@ -195,6 +192,14 @@ if __name__ == "__main__":
             else:
                 if line!='\n':
                     temp_data += [map(int,list(line[:-1]))]
+        return data_dict
+
+
+
+
+# Driver main function to test above functions
+if __name__ == "__main__":
+    data_dict = load_puzzles('evenMoreConsistent.txt')
 
     del data_dict[0]
 
