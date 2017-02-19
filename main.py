@@ -1,4 +1,6 @@
 #!/usr/bin/python
+import numpy as np
+
 
 def print_sudoku(list_sud):
     for i in range(9):
@@ -11,6 +13,32 @@ def print_sudoku(list_sud):
         print
 
     print '-----------------------\n'
+
+
+
+
+
+
+def find_domain(l,list_sud):
+
+    x = l[0]; y = l[1]
+
+    if x/3==1:
+        x1=0 ; x2 = 3
+    if x/3 == 2 :
+        x1 = 3 ; x2 = 6
+    if x/3 ==3 :
+        x1 = 6 ; x2 =9
+    if y/3==1:
+        y1=0 ; y2 = 3
+    if y/3 == 2 :
+        y1 = 3 ; y2 = 6
+    if y/3 ==3 :
+        y1 = 6 ; y2 =9
+
+        return list(set(list_sud[:,y]) & set(list_sud[x,:]) & set(np.unique(list_sud[x1:x2,y1:y2])) )
+
+
 
 
 
@@ -106,7 +134,7 @@ if __name__ == "__main__":
         temp_data = []
         for line in lines:
             if 'easy' in line or 'medium' in line or 'hard' in line  or 'evil' in line:
-                data_dict[count]=temp_data
+                data_dict[count]=np.array(temp_data)
                 count+=1
                 temp_data=[]
                 continue
@@ -119,6 +147,17 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in [1,2,3,4]:
+    for key in [1]:
+        domain_dict={}
+        sud_array =data_dict[key]
+
+        for i in range(9):
+            for j in range(9):
+                if sud_array[i,j]==0:
+                    domain_dict[i,j] = find_domain([i,j],sud_array)
+                else:
+                    domain_dict[i,j] = [sud_array[i,j]]
+
+        print domain_dict
         print key,solve_sudoku(data_dict[key])
         print_sudoku(data_dict[key])
