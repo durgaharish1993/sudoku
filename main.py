@@ -16,6 +16,44 @@ def print_sudoku(list_sud):
 
 
 
+# This function updates domain.
+def update_domain(domain_dict,list_sud):
+
+    for i in range(9):
+        for j in range(9):
+            if list_sud[i, j] == 0:
+                domain_dict[i, j] = find_domain([i, j], list_sud)
+    return domain_dict
+
+
+def constraint_propogation(domain_dict,list_sud):
+    while 1:
+        check =True
+        if domain_dict=={}:
+            domain_dict = update_domain(domain_dict,list_sud)
+
+        for key,value in domain_dict.items():
+            if len(value)==1:
+                check = False
+                list_sud[key[0],key[1]]= value[0]
+                print key, value
+                del domain_dict[key]
+                break
+        print len(domain_dict)
+        #print key
+        #print value
+        print print_sudoku(list_sud)
+        domain_dict=update_domain(domain_dict,list_sud)
+
+        if check:
+            if domain_dict=={}:
+                return True
+
+            else:
+                return solve_sudoku(list(list_sud))
+
+
+
 
 
 
@@ -36,19 +74,15 @@ def find_domain(l,list_sud):
     if y/3 ==2 :
         y1 = 6 ; y2 =9
 
-    temp = set(range(9)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])) )
+    temp = set(range(10)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])) )
     return list(temp)
 
 
-# 240300000
-# 000520407
-# 000046008
-# 610700084
-# 009060500
-# 730005061
-# 100470000
-# 302051000
-# 000002019
+
+
+
+
+
 
 
 
@@ -96,9 +130,8 @@ def used_in_box(list_sud, row, col, num):
 def check_location_is_safe(list_sud, row, col, num):
     # Check if 'num' is not already placed in current row,
     # current column and current 3x3 box
-    return not used_in_row(list_sud, row, num) \
-        and not used_in_col(list_sud, col, num)\
-	and not used_in_box(list_sud, row - row % 3, col - col % 3, num)
+    return not used_in_row(list_sud, row, num) and not used_in_col(list_sud, col, num) and not used_in_box(list_sud, row - row % 3,
+                                                                                                 col - col % 3, num)
 
 
 def solve_sudoku(list_sud):
@@ -112,7 +145,7 @@ def solve_sudoku(list_sud):
     # Assigning list values to row and col that we got from the above Function
     row = l[0]
     col = l[1]
-
+    #print l
     # consider digits 1 to 9
     for num in range(1, 10):
 
@@ -131,6 +164,10 @@ def solve_sudoku(list_sud):
 
     # this triggers backtracking
     return False
+
+
+
+
 
 
 # Driver main function to test above functions
@@ -157,18 +194,12 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in [1]:
+    for key in data_dict.keys():
+        if key in [27]:
+            continue
         domain_dict={}
         sud_array =data_dict[key]
 
-        for i in range(9):
-            for j in range(9):
-                if sud_array[i,j]==0:
-                    domain_dict[i,j] = find_domain([i,j],sud_array)
-                else:
-                    domain_dict[i,j] = [sud_array[i,j]]
-
-        print domain_dict
-        print sud_array
-        #print key,solve_sudoku(data_dict[key])
+        #constraint_propogation({},sud_array)
+        print key,solve_sudoku(sud_array)
         print_sudoku(data_dict[key])
