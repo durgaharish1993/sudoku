@@ -138,6 +138,8 @@ def solve_sudoku(list_sud):
     # 'l' is a list variable that keeps the record of row and col in find_empty_location Function
     l = [0, 0]
 
+
+
     # If there is no unassigned location, we are done
     if (not find_empty_location(list_sud, l)):
         return True
