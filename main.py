@@ -14,14 +14,12 @@ def print_sudoku(list_sud):
 
 
 
-def find_empty_location(list_sud, l):
+def find_empty_location(list_sud):
     for row in range(9):
         for col in range(9):
             if (list_sud[row][col] == 0):
-                l[0] = row
-                l[1] = col
-                return True
-    return False
+                return (row, col)
+    return (None, None)
 
 
 # Returns a boolean which indicates whether any assigned entry
@@ -64,16 +62,10 @@ def check_location_is_safe(list_sud, row, col, num):
 
 
 def solve_sudoku(list_sud):
-    # 'l' is a list variable that keeps the record of row and col in find_empty_location Function
-    l = [0, 0]
-
     # If there is no unassigned location, we are done
-    if (not find_empty_location(list_sud, l)):
+    (row, col) = find_empty_location(list_sud)
+    if row == None:
         return True
-
-    # Assigning list values to row and col that we got from the above Function
-    row = l[0]
-    col = l[1]
 
     # consider digits 1 to 9
     for num in range(1, 10):
