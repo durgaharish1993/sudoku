@@ -65,7 +65,7 @@ def remove_domains(indicator,i,j,key,coordinates,domain_dict):
                 for key2 in domain_dict:
                     if key2==(i1,j1):
                         check_list+=[key2]
-    print check_list
+    #print check_list
     for cor in check_list:
         if list(cor) not in coordinates:
             domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
@@ -82,48 +82,52 @@ def remove_domains(indicator,i,j,key,coordinates,domain_dict):
 
 
 
-def naked_triples(domain_dict,list_sud,k):
+def naked_triples_row(domain_dict,list_sud,k):
 
     #row unit
 
     if domain_dict=={}:
         domain_dict = update_domain(domain_dict,list_sud)
 
-    # show_domain(domain_dict)
-    # for i in range(9):
-    #     set_values = defaultdict(list)
-    #     for j in range(9):
-    #         if (i,j) in domain_dict:
-    #             if len(domain_dict[i,j])<=k:
-    #                 set_values[frozenset(domain_dict[i, j])] += [[i, j]]
-    #
-    #     final_dict_values = finding_coordinates(set_values,k)
-    #
-    #     for key in final_dict_values:
-    #         if len(final_dict_values[key])==k:
-    #
-    #             remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
-    #             return (key,final_dict_values[key])
+    #show_domain(domain_dict)
+    for i in range(9):
+        set_values = defaultdict(list)
+        for j in range(9):
+            if (i,j) in domain_dict:
+                if len(domain_dict[i,j])<=k:
+                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
+
+        final_dict_values = finding_coordinates(set_values,k)
+
+        for key in final_dict_values:
+            if len(final_dict_values[key])==k:
+
+                remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
+                return True
+    return False
 
 
+def naked_triples_column(domain_dict,list_sud,k):
+
+    #column unit
+    for j in range(9):
+        set_values = defaultdict(list)
 
 
-    # #column unit
-    # for j in range(9):
-    #     set_values = defaultdict(list)
-    #
-    #
-    #     for i in range(9):
-    #         if (i,j) in domain_dict:
-    #             if len(domain_dict[i,j])<=k:
-    #                 set_values[frozenset(domain_dict[i, j])] += [[i, j]]
-    #
-    #     final_dict_values = finding_coordinates(set_values,k)
-    #     for key in final_dict_values:
-    #         if len(final_dict_values[key]) == k:
-    #             remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
-    #             return (key, final_dict_values[key])
+        for i in range(9):
+            if (i,j) in domain_dict:
+                if len(domain_dict[i,j])<=k:
+                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
 
+        final_dict_values = finding_coordinates(set_values,k)
+        for key in final_dict_values:
+            if len(final_dict_values[key]) == k:
+                remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
+                return True
+
+    return False
+
+def naked_triples_box(domain_dict, list_sud, k):
 
     #box unit
     for i in [0,3,6]:
@@ -138,10 +142,12 @@ def naked_triples(domain_dict,list_sud,k):
             final_dict_values=finding_coordinates(set_values,k)
             for key in final_dict_values:
                 if len(final_dict_values[key]) == k:
-                    print key,final_dict_values[key]
-                    print i,j
+                    #print key,final_dict_values[key]
+                    #print i,j
                     remove_domains('b', i, j, key, final_dict_values[key], domain_dict)
-                    return (key, final_dict_values[key])
+                    return True
+
+    return False
 
 
 
@@ -157,16 +163,158 @@ def update_domain(domain_dict,list_sud):
     for i in range(9):
         for j in range(9):
             if list_sud[i, j] == 0:
-                domain_dict[i, j] = find_domain([i, j], list_sud)
+
+                domain_dict[i, j] = find_domain([i, j], list_sud,domain_dict[i,j])
     return domain_dict
 
 
-def constraint_propogation(domain_dict,list_sud):
-    while 1:
-        check =True
-        if domain_dict=={}:
-            domain_dict = update_domain(domain_dict,list_sud)
+def create_domain(domain_dict,list_sud):
 
+    for i in range(9):
+        for j in range(9):
+            if list_sud[i, j] == 0:
+                domain_dict[i,j]=range(10)
+
+    return domain_dict
+
+
+
+
+def rule3_row(domain_dict,list_stud):
+    if domain_dict=={}:
+        domain_dict = update_domain(domain_dict,list_sud)
+
+
+    for i in range(9):
+
+        val_count=defaultdict(int)
+        dict_indices = defaultdict(list)
+        deleted_list=[]
+        for j in range(9):
+            if (i,j) in domain_dict:
+
+                for val in domain_dict[i,j]:
+                    val_count[val]+=1
+                    dict_indices[val]+=[(i,j)]
+
+        for key,item in val_count.items():
+            if item==1 and (dict_indices[key][0] not in deleted_list):
+                deleted_list+=[dict_indices[key][0]]
+                del domain_dict[dict_indices[key][0]]
+                print dict_indices[key][0], key
+                #print dict_indices[key][0]
+                #print val_count
+                #print dict_indices
+                print 'row'
+                list_sud[dict_indices[key][0]]=key
+
+
+
+
+def rule3_column(domain_dict, list_stud):
+    if domain_dict == {}:
+        domain_dict = update_domain(domain_dict, list_sud)
+
+    for j in range(9):
+
+        val_count = defaultdict(int)
+        dict_indices = defaultdict(list)
+        deleted_list=[]
+        for i in range(9):
+            if (i, j) in domain_dict:
+
+                for val in domain_dict[i, j]:
+                    val_count[val] += 1
+                    dict_indices[val] += [(i, j)]
+
+
+
+        for key, item in val_count.items():
+
+            if (item == 1) and (dict_indices[key][0] not in deleted_list):
+                deleted_list += [dict_indices[key][0]]
+                del domain_dict[dict_indices[key][0]]
+                print 'column'
+
+                #print dict_indices[key][0]
+                list_sud[dict_indices[key][0]]=key
+
+
+
+def rule3_box(domain_dict, list_stud):
+    if domain_dict == {}:
+        domain_dict = update_domain(domain_dict, list_sud)
+    for i in [0,3,6]:
+        for j in [0,3,6]:
+            set_values = defaultdict(list)
+            val_count = defaultdict(int)
+            dict_indices = defaultdict(list)
+            deleted_list =[]
+            for i1 in range(i,i+3):
+                for j1 in range(j,j+3):
+                    if (i1, j1) in domain_dict:
+                        for val in domain_dict[i1, j1]:
+                            #print val
+                            val_count[val] += 1
+                            dict_indices[val] += [(i1, j1)]
+            #print val_count
+            #print dict_indices
+            for key, item in val_count.items():
+                if item == 1 and ( dict_indices[key][0] not in deleted_list):
+                    deleted_list+=[dict_indices[key][0]]
+                    del domain_dict[dict_indices[key][0]]
+                    #print dict_indices[key][0]
+                    print 'box'
+                    list_sud[dict_indices[key][0]] = key
+
+            #if i==3 and j==3:
+                #print val_count
+                #print dict_indices
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def constraint_propogation(domain_dict,list_sud,k):
+    domain_dict = create_domain(domain_dict, list_sud)
+    while 1:
+
+        check =True
+        #Applying Rule 1
+        domain_dict = update_domain(domain_dict,list_sud)
+        print 'Rule 1', domain_dict
+
+
+
+        #Applying Rule 2
         for key,value in domain_dict.items():
             if len(value)==1:
                 check = False
@@ -174,10 +322,25 @@ def constraint_propogation(domain_dict,list_sud):
                 #print key, value
                 del domain_dict[key]
                 break
-        #print len(domain_dict)
-        #print key
-        #print value
-        #print print_sudoku(list_sud)
+        print 'Rule 2', domain_dict
+
+        # #Applying Rule 3
+        # rule3_row(domain_dict,list_sud)
+        # #print 'Rule 3 Row', domain_dict
+        # rule3_column(domain_dict,list_sud)
+        # rule3_box(domain_dict,list_sud)
+
+        print 'Rule 3', domain_dict
+
+
+        #Applying Rule 4
+        naked_triples_row(domain_dict,list_sud,k)
+        naked_triples_column(domain_dict,list_sud,k)
+        naked_triples_box(domain_dict, list_sud, k)
+        print 'Rule 4', domain_dict
+
+
+
         domain_dict=update_domain(domain_dict,list_sud)
 
         if check:
@@ -185,6 +348,7 @@ def constraint_propogation(domain_dict,list_sud):
                 return True
 
             else:
+
                 return solve_sudoku_search(list(list_sud),domain_dict)
 
 
@@ -194,7 +358,7 @@ def constraint_propogation(domain_dict,list_sud):
 
 
 
-def find_domain(l,list_sud):
+def find_domain(l,list_sud,vals):
 
     x = l[0]; y = l[1]
 
@@ -211,7 +375,7 @@ def find_domain(l,list_sud):
     if y/3 ==2 :
         y1 = 6 ; y2 =9
 
-    temp = set(range(10)).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])  ) )
+    temp = set(vals).difference(set(list_sud[:,y]) | set(list_sud[x,:]) | set(np.unique(list_sud[x1:x2,y1:y2])  ) )
     return list(temp)
 
 
@@ -287,6 +451,7 @@ def solve_sudoku_search(list_sud,domain_dict):
     col = l[1]
     #print l
     # consider digits 1 to 9
+    print domain_dict[(row,col)]
     for num in domain_dict[(row,col)]:
 
         if (check_location_is_safe(list_sud, row, col, num)):
@@ -314,7 +479,7 @@ def solve_sudoku_search(list_sud,domain_dict):
 if __name__ == "__main__":
 
 
-    with open('testInput.txt','rb') as fp:
+    with open('evenMoreConsistent.txt','rb') as fp:
         lines=fp.readlines()
         data_dict = {}
         count=0
@@ -332,16 +497,37 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in [2]:
+    #print data_dict
+    for key in [1]:
         if key in [27]:
             continue
 
         domain_dict={}
-        list_sud =data_dict[key]
-        back_tracking_count = 0
-        naked_triples(domain_dict,list_sud,3)
-        show_domain(domain_dict)
 
-        #update_domain(domain_dict,list_sud)
-        #solve_sudoku_search(list_sud,domain_dict)
-        #print key,constraint_propogation(domain_dict,list_sud), back_tracking_count
+        print key
+
+        print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+        list_sud =data_dict[key]
+        print_sudoku(list_sud)
+        back_tracking_count = 0
+        k=3
+        print key, constraint_propogation(domain_dict, list_sud,k), back_tracking_count
+        print_sudoku(list_sud)
+        print domain_dict
+        # #naked_triples(domain_dict,list_sud,3)
+        # #show_domain(domain_dict)
+        # print 'None applied '
+        # print_sudoku(list_sud)
+        # #rule3_row(domain_dict,list_sud)
+        # #print 'row'
+        # #print_sudoku(list_sud)
+        #
+        # #rule3_column(domain_dict,list_sud)
+        # #print 'column'
+        # #print_sudoku(list_sud)
+        # print 'box'
+        # rule3_box(domain_dict,list_sud)
+        # print_sudoku(list_sud)
+        # #update_domain(domain_dict,list_sud)
+        # #solve_sudoku_search(list_sud,domain_dict)
+        # ##print key,constraint_propogation(domain_dict,list_sud), back_tracking_count
