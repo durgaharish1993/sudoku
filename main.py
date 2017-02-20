@@ -22,7 +22,7 @@ def print_sudoku(list_sud):
 def show_domain(domain_dict):
     for i in range(9):
         if i%3==0:
-            print '--------------------------------------------------------------------------------------------------------------------\n\n',
+            print '--------------------------------------------------------------------------------------------------------------------\n',
         for j in range(9):
             if j%3==0:
                 print '|',
@@ -33,7 +33,7 @@ def show_domain(domain_dict):
                 print 'f'+' '*8,
         print
 
-    print '--------------------------------------------------------------------------------------------------------------------\n\n'
+    print '--------------------------------------------------------------------------------------------------------------------\n'
 
 
 
@@ -69,6 +69,7 @@ def remove_domains(indicator,i,j,key,coordinates,domain_dict):
     for cor in check_list:
         if list(cor) not in coordinates:
             domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
+            print "coordinates here", cor
 
 
 
@@ -101,7 +102,12 @@ def naked_triples_row(domain_dict,list_sud,k):
 
         for key in final_dict_values:
             if len(final_dict_values[key])==k:
+                print "Naked triple found in row ", i, " : ", final_dict_values[key]
 
+                print_sudoku(list_sud)
+                show_domain(domain_dict)
+                print_sudoku(list_sud)
+                show_domain(domain_dict)
                 remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
                 return True
     return False
@@ -122,6 +128,7 @@ def naked_triples_column(domain_dict,list_sud,k):
         final_dict_values = finding_coordinates(set_values,k)
         for key in final_dict_values:
             if len(final_dict_values[key]) == k:
+                print "Naked triple found in col ", j
                 remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
                 return True
 
@@ -142,6 +149,7 @@ def naked_triples_box(domain_dict, list_sud, k):
             final_dict_values=finding_coordinates(set_values,k)
             for key in final_dict_values:
                 if len(final_dict_values[key]) == k:
+                    print "Naked triple found in box ", i, " ", j
                     #print key,final_dict_values[key]
                     #print i,j
                     remove_domains('b', i, j, key, final_dict_values[key], domain_dict)
@@ -160,11 +168,8 @@ def naked_triples_box(domain_dict, list_sud, k):
 # This function updates domain.
 def update_domain(domain_dict,list_sud):
 
-    for i in range(9):
-        for j in range(9):
-            if list_sud[i, j] == 0:
-
-                domain_dict[i, j] = find_domain([i, j], list_sud,domain_dict[i,j])
+    for (i,j) in domain_dict.keys():
+        domain_dict[i, j] = find_domain([i, j], list_sud,domain_dict[i,j])
     return domain_dict
 
 
@@ -201,12 +206,18 @@ def rule3_row(domain_dict,list_stud):
             if item==1 and (dict_indices[key][0] not in deleted_list):
                 deleted_list+=[dict_indices[key][0]]
                 del domain_dict[dict_indices[key][0]]
-                print dict_indices[key][0], key
+
+                #update_domain(domain_dict, list_sud)
+
+                #print dict_indices[key][0], key
                 #print dict_indices[key][0]
                 #print val_count
                 #print dict_indices
-                print 'row'
                 list_sud[dict_indices[key][0]]=key
+                print 'In row ', i, " only position ", dict_indices[key][0], " has value ", key, " in its domain"
+                print_sudoku(list_sud)
+                show_domain(domain_dict)
+
 
 
 
@@ -232,12 +243,18 @@ def rule3_column(domain_dict, list_stud):
         for key, item in val_count.items():
 
             if (item == 1) and (dict_indices[key][0] not in deleted_list):
+                if (j == 0):
+                    print "I PREDICT THINGS ARE ABOUT TO BREAK"
+                    print_sudoku(list_sud)
+                    show_domain(domain_dict)
                 deleted_list += [dict_indices[key][0]]
                 del domain_dict[dict_indices[key][0]]
-                print 'column'
-
                 #print dict_indices[key][0]
                 list_sud[dict_indices[key][0]]=key
+                print 'In col ', j, " only position ", dict_indices[key][0], " has value ", key, " in its domain", val_count
+                print_sudoku(list_sud)
+                show_domain(domain_dict)
+                return
 
 
 
@@ -264,8 +281,11 @@ def rule3_box(domain_dict, list_stud):
                     deleted_list+=[dict_indices[key][0]]
                     del domain_dict[dict_indices[key][0]]
                     #print dict_indices[key][0]
-                    print 'box'
                     list_sud[dict_indices[key][0]] = key
+                    print 'In box ', i, " ", j, " only position ", dict_indices[key][0], " has value ", key, " in its domain"
+                    print_sudoku(list_sud)
+                    show_domain(domain_dict)
+                    return
 
             #if i==3 and j==3:
                 #print val_count
@@ -310,45 +330,53 @@ def constraint_propogation(domain_dict,list_sud,k):
         check =True
         #Applying Rule 1
         domain_dict = update_domain(domain_dict,list_sud)
-        print 'Rule 1', domain_dict
-
-
+        print 'Rule 1 domain dictionary has ', len(domain_dict)
+        print_sudoku(list_sud)
+        show_domain(domain_dict)
 
         #Applying Rule 2
         for key,value in domain_dict.items():
             if len(value)==1:
                 check = False
                 list_sud[key[0],key[1]]= value[0]
-                #print key, value
+                print "At position ", key[0], ", ", key[1], " its domain only contains ", value[0]
+                print 'After Rule 2 domain dictionary has ', len(domain_dict)
+                print_sudoku(list_sud)
+                show_domain(domain_dict)
                 del domain_dict[key]
+                domain_dict = update_domain(domain_dict, list_sud)
                 break
-        print 'Rule 2', domain_dict
+
 
         # #Applying Rule 3
-        # rule3_row(domain_dict,list_sud)
-        # #print 'Rule 3 Row', domain_dict
-        # rule3_column(domain_dict,list_sud)
-        # rule3_box(domain_dict,list_sud)
-
-        print 'Rule 3', domain_dict
-
+        if(rule3_row(domain_dict,list_sud)): continue
+        domain_dict = update_domain(domain_dict, list_sud)
+        rule3_column(domain_dict,list_sud)
+        domain_dict = update_domain(domain_dict, list_sud)
+        rule3_box(domain_dict,list_sud)
+        domain_dict = update_domain(domain_dict, list_sud)
+        print 'After Rule 3 domain dictionary has ', len(domain_dict)
 
         #Applying Rule 4
         naked_triples_row(domain_dict,list_sud,k)
+        domain_dict = update_domain(domain_dict, list_sud)
         naked_triples_column(domain_dict,list_sud,k)
+        domain_dict = update_domain(domain_dict, list_sud)
         naked_triples_box(domain_dict, list_sud, k)
-        print 'Rule 4', domain_dict
+        domain_dict = update_domain(domain_dict, list_sud)
+        print 'After Naked Triples domain dictionary has ', len(domain_dict)
+        print_sudoku(list_sud)
+        show_domain(domain_dict)
 
 
-
-        domain_dict=update_domain(domain_dict,list_sud)
+        #domain_dict=update_domain(domain_dict,list_sud)
 
         if check:
             if domain_dict=={}:
                 return True
 
             else:
-
+                show_domain(domain_dict)
                 return solve_sudoku_search(list(list_sud),domain_dict)
 
 
@@ -451,7 +479,7 @@ def solve_sudoku_search(list_sud,domain_dict):
     col = l[1]
     #print l
     # consider digits 1 to 9
-    print domain_dict[(row,col)]
+    #print domain_dict[(row,col)]
     for num in domain_dict[(row,col)]:
 
         if (check_location_is_safe(list_sud, row, col, num)):
@@ -498,9 +526,7 @@ if __name__ == "__main__":
     del data_dict[0]
 
     #print data_dict
-    for key in [1]:
-        if key in [27]:
-            continue
+    for key in [27]:
 
         domain_dict={}
 
