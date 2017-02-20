@@ -103,11 +103,6 @@ def naked_triples_row(domain_dict,list_sud,k):
         for key in final_dict_values:
             if len(final_dict_values[key])==k:
                 print "Naked triple found in row ", i, " : ", final_dict_values[key]
-
-                print_sudoku(list_sud)
-                show_domain(domain_dict)
-                print_sudoku(list_sud)
-                show_domain(domain_dict)
                 remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
                 return True
     return False
@@ -534,10 +529,13 @@ if __name__ == "__main__":
 
         print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
         list_sud =data_dict[key]
-        print_sudoku(list_sud)
+        #print_sudoku(list_sud)
         back_tracking_count = 0
         k=3
-        print key, constraint_propogation(domain_dict, list_sud,k), back_tracking_count
+
+
+        result = constraint_propogation(domain_dict, list_sud, k)
+        print "Problem =\t",key, "\tSolved=\t", result, "\tBacktracks\t", back_tracking_count
         print_sudoku(list_sud)
         print domain_dict
         # #naked_triples(domain_dict,list_sud,3)
