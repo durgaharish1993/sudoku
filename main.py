@@ -2,6 +2,9 @@
 import numpy as np
 from collections import defaultdict
 
+#back_tracking_count = 0
+
+
 def print_sudoku(list_sud):
     for i in range(9):
         if i%3==0:
@@ -59,8 +62,10 @@ def remove_domains(indicator,i,j,key,coordinates,domain_dict):
     if indicator=='b':
         for i1 in range(i,i+3):
             for j1 in range(j,j+3):
-                check_list = [ key2 for key2 in domain_dict if key2==(i1,j1)]
-
+                for key2 in domain_dict:
+                    if key2==(i1,j1):
+                        check_list+=[key2]
+    print check_list
     for cor in check_list:
         if list(cor) not in coordinates:
             domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
@@ -84,40 +89,40 @@ def naked_triples(domain_dict,list_sud,k):
     if domain_dict=={}:
         domain_dict = update_domain(domain_dict,list_sud)
 
-    show_domain(domain_dict)
-    for i in range(9):
-        set_values = defaultdict(list)
-        for j in range(9):
-            if (i,j) in domain_dict:
-                if len(domain_dict[i,j])<=k:
-                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
-
-        final_dict_values = finding_coordinates(set_values,k)
-
-        for key in final_dict_values:
-            if len(final_dict_values[key])==k:
-
-                remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
-                return (key,final_dict_values[key])
-
-
+    # show_domain(domain_dict)
+    # for i in range(9):
+    #     set_values = defaultdict(list)
+    #     for j in range(9):
+    #         if (i,j) in domain_dict:
+    #             if len(domain_dict[i,j])<=k:
+    #                 set_values[frozenset(domain_dict[i, j])] += [[i, j]]
+    #
+    #     final_dict_values = finding_coordinates(set_values,k)
+    #
+    #     for key in final_dict_values:
+    #         if len(final_dict_values[key])==k:
+    #
+    #             remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
+    #             return (key,final_dict_values[key])
 
 
-    #column unit
-    for j in range(9):
-        set_values = defaultdict(list)
 
 
-        for i in range(9):
-            if (i,j) in domain_dict:
-                if len(domain_dict[i,j])<=k:
-                    set_values[frozenset(domain_dict[i, j])] += [[i, j]]
-
-        final_dict_values = finding_coordinates(set_values,k)
-        for key in final_dict_values:
-            if len(final_dict_values[key]) == k:
-                remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
-                return (key, final_dict_values[key])
+    # #column unit
+    # for j in range(9):
+    #     set_values = defaultdict(list)
+    #
+    #
+    #     for i in range(9):
+    #         if (i,j) in domain_dict:
+    #             if len(domain_dict[i,j])<=k:
+    #                 set_values[frozenset(domain_dict[i, j])] += [[i, j]]
+    #
+    #     final_dict_values = finding_coordinates(set_values,k)
+    #     for key in final_dict_values:
+    #         if len(final_dict_values[key]) == k:
+    #             remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
+    #             return (key, final_dict_values[key])
 
 
     #box unit
@@ -133,6 +138,8 @@ def naked_triples(domain_dict,list_sud,k):
             final_dict_values=finding_coordinates(set_values,k)
             for key in final_dict_values:
                 if len(final_dict_values[key]) == k:
+                    print key,final_dict_values[key]
+                    print i,j
                     remove_domains('b', i, j, key, final_dict_values[key], domain_dict)
                     return (key, final_dict_values[key])
 
@@ -168,9 +175,9 @@ def constraint_propogation(domain_dict,list_sud):
                 del domain_dict[key]
                 break
         #print len(domain_dict)
-        print key
+        #print key
         #print value
-        print print_sudoku(list_sud)
+        #print print_sudoku(list_sud)
         domain_dict=update_domain(domain_dict,list_sud)
 
         if check:
@@ -178,7 +185,7 @@ def constraint_propogation(domain_dict,list_sud):
                 return True
 
             else:
-                return solve_sudoku(list(list_sud))
+                return solve_sudoku_search(list(list_sud),domain_dict)
 
 
 
@@ -264,9 +271,10 @@ def check_location_is_safe(list_sud, row, col, num):
                                                                                                  col - col % 3, num)
 
 
-def solve_sudoku(list_sud):
+def solve_sudoku_search(list_sud,domain_dict):
     # 'l' is a list variable that keeps the record of row and col in find_empty_location Function
     l = [0, 0]
+    global back_tracking_count
 
 
 
@@ -279,22 +287,22 @@ def solve_sudoku(list_sud):
     col = l[1]
     #print l
     # consider digits 1 to 9
-    for num in range(1, 10):
+    for num in domain_dict[(row,col)]:
 
-        # if looks promising
         if (check_location_is_safe(list_sud, row, col, num)):
 
-            # make tentative assignment
+
             list_sud[row][col] = num
 
-            # return, if sucess, ya!
-            if (solve_sudoku(list_sud)):
+
+            if (solve_sudoku_search(list_sud,domain_dict)):
                 return True
 
-            # failure, unmake & try again
             list_sud[row][col] = 0
 
-    # this triggers backtracking
+            back_tracking_count+=1
+
+
     return False
 
 
@@ -306,13 +314,14 @@ def solve_sudoku(list_sud):
 if __name__ == "__main__":
 
 
-    with open('evenMoreConsistent.txt','rb') as fp:
+    with open('testInput.txt','rb') as fp:
         lines=fp.readlines()
         data_dict = {}
         count=0
         temp_data = []
         for line in lines:
             if 'easy' in line or 'medium' in line or 'hard' in line  or 'evil' in line:
+
                 data_dict[count]=np.array(temp_data)
                 count+=1
                 temp_data=[]
@@ -323,16 +332,16 @@ if __name__ == "__main__":
 
     del data_dict[0]
 
-    for key in [1]:
+    for key in [2]:
         if key in [27]:
             continue
 
         domain_dict={}
-        #domain_dict[0,0]=[1,2,3,4]
-        sud_array =data_dict[key]
-
-        print naked_triples(domain_dict,sud_array,3)
+        list_sud =data_dict[key]
+        back_tracking_count = 0
+        naked_triples(domain_dict,list_sud,3)
         show_domain(domain_dict)
-        #print 'mdfdfdf',domain_dict[(1,1)]
-        #print key,constraint_propogation(domain_dict,sud_array)
-        #print_sudoku(data_dict[key])
+
+        #update_domain(domain_dict,list_sud)
+        #solve_sudoku_search(list_sud,domain_dict)
+        #print key,constraint_propogation(domain_dict,list_sud), back_tracking_count
