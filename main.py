@@ -66,10 +66,17 @@ def remove_domains(indicator,i,j,key,coordinates,domain_dict):
                     if key2==(i1,j1):
                         check_list+=[key2]
     #print check_list
+    dict_flag=False
     for cor in check_list:
         if list(cor) not in coordinates:
-            domain_dict[cor]=list(frozenset(domain_dict[cor]).difference(key))
-            print "coordinates here", cor
+            temp_1 = list(frozenset(domain_dict[cor]).difference(key))
+            if temp_1==domain_dict[cor]:
+                continue
+
+            dict_flag = True
+            domain_dict[cor]=temp_1
+    return dict_flag
+
 
 
 
@@ -102,9 +109,10 @@ def naked_triples_row(domain_dict,list_sud,k):
 
         for key in final_dict_values:
             if len(final_dict_values[key])==k:
-                print "Naked triple found in row ", i, " : ", final_dict_values[key]
-                remove_domains('r',i,j, key, final_dict_values[key], domain_dict)
-                return True
+                #print "Naked triple found in row ", i, " : ", final_dict_values[key]
+                if remove_domains('r',i,j, key, final_dict_values[key], domain_dict):
+                    return True
+
     return False
 
 
@@ -123,9 +131,9 @@ def naked_triples_column(domain_dict,list_sud,k):
         final_dict_values = finding_coordinates(set_values,k)
         for key in final_dict_values:
             if len(final_dict_values[key]) == k:
-                print "Naked triple found in col ", j
-                remove_domains('c', i, j, key, final_dict_values[key], domain_dict)
-                return True
+                #print "Naked triple found in col ", j
+                if remove_domains('c', i, j, key, final_dict_values[key], domain_dict):
+                    return True
 
     return False
 
@@ -144,11 +152,11 @@ def naked_triples_box(domain_dict, list_sud, k):
             final_dict_values=finding_coordinates(set_values,k)
             for key in final_dict_values:
                 if len(final_dict_values[key]) == k:
-                    print "Naked triple found in box ", i, " ", j
+                    #print "Naked triple found in box ", i, " ", j
                     #print key,final_dict_values[key]
                     #print i,j
-                    remove_domains('b', i, j, key, final_dict_values[key], domain_dict)
-                    return True
+                    if remove_domains('b', i, j, key, final_dict_values[key], domain_dict):
+                        return True
 
     return False
 
@@ -201,17 +209,11 @@ def rule3_row(domain_dict,list_stud):
             if item==1 and (dict_indices[key][0] not in deleted_list):
                 deleted_list+=[dict_indices[key][0]]
                 del domain_dict[dict_indices[key][0]]
-
-                #update_domain(domain_dict, list_sud)
-
-                #print dict_indices[key][0], key
-                #print dict_indices[key][0]
-                #print val_count
-                #print dict_indices
                 list_sud[dict_indices[key][0]]=key
-                print 'In row ', i, " only position ", dict_indices[key][0], " has value ", key, " in its domain"
-                print_sudoku(list_sud)
-                show_domain(domain_dict)
+                return True
+    return False
+
+
 
 
 
@@ -238,18 +240,13 @@ def rule3_column(domain_dict, list_stud):
         for key, item in val_count.items():
 
             if (item == 1) and (dict_indices[key][0] not in deleted_list):
-                if (j == 0):
-                    print "I PREDICT THINGS ARE ABOUT TO BREAK"
-                    print_sudoku(list_sud)
-                    show_domain(domain_dict)
                 deleted_list += [dict_indices[key][0]]
                 del domain_dict[dict_indices[key][0]]
-                #print dict_indices[key][0]
+
                 list_sud[dict_indices[key][0]]=key
-                print 'In col ', j, " only position ", dict_indices[key][0], " has value ", key, " in its domain", val_count
-                print_sudoku(list_sud)
-                show_domain(domain_dict)
-                return
+
+                return True
+    return False
 
 
 
@@ -277,15 +274,12 @@ def rule3_box(domain_dict, list_stud):
                     del domain_dict[dict_indices[key][0]]
                     #print dict_indices[key][0]
                     list_sud[dict_indices[key][0]] = key
-                    print 'In box ', i, " ", j, " only position ", dict_indices[key][0], " has value ", key, " in its domain"
-                    print_sudoku(list_sud)
-                    show_domain(domain_dict)
-                    return
+                    #print 'In box ', i, " ", j, " only position ", dict_indices[key][0], " has value ", key, " in its domain"
+                    #print_sudoku(list_sud)
+                    #show_domain(domain_dict)
+                    return True
 
-            #if i==3 and j==3:
-                #print val_count
-                #print dict_indices
-
+    return False
 
 
 
@@ -320,59 +314,80 @@ def rule3_box(domain_dict, list_stud):
 
 def constraint_propogation(domain_dict,list_sud,k):
     domain_dict = create_domain(domain_dict, list_sud)
-    while 1:
 
-        check =True
-        #Applying Rule 1
+    Apply_rule2 = True
+    Apply_rule3 = True
+    Apply_rule4 = True
+
+    Rule_2_Applied = False
+    Rule_3_Applied = False
+    Rule_4_Applied = False
+    Search_solved = False
+    for p in range(10000):
+        if domain_dict=={}:
+            return [True,True,Rule_2_Applied,Rule_3_Applied,Rule_4_Applied,Search_solved]
+
+        #print "Applied Rule -1"
         domain_dict = update_domain(domain_dict,list_sud)
-        print 'Rule 1 domain dictionary has ', len(domain_dict)
-        print_sudoku(list_sud)
-        show_domain(domain_dict)
 
-        #Applying Rule 2
-        for key,value in domain_dict.items():
-            if len(value)==1:
-                check = False
-                list_sud[key[0],key[1]]= value[0]
-                print "At position ", key[0], ", ", key[1], " its domain only contains ", value[0]
-                print 'After Rule 2 domain dictionary has ', len(domain_dict)
-                print_sudoku(list_sud)
-                show_domain(domain_dict)
-                del domain_dict[key]
-                domain_dict = update_domain(domain_dict, list_sud)
-                break
+        # Applying Rule 2
+        if Apply_rule2:
+
+
+            dic_invalid = False
+            for key,value in domain_dict.items():
+                if len(value)==1:
+                    #print "Applied Rule -2"
+                    check = False
+                    list_sud[key[0],key[1]]= value[0]
+                    del domain_dict[key]
+                    domain_dict = update_domain(domain_dict, list_sud)
+                    dic_invalid = True
+                    Rule_2_Applied = True
+                    break
+            if dic_invalid: continue
+
+
+
+
 
 
         # #Applying Rule 3
-        if(rule3_row(domain_dict,list_sud)): continue
-        domain_dict = update_domain(domain_dict, list_sud)
-        rule3_column(domain_dict,list_sud)
-        domain_dict = update_domain(domain_dict, list_sud)
-        rule3_box(domain_dict,list_sud)
-        domain_dict = update_domain(domain_dict, list_sud)
-        print 'After Rule 3 domain dictionary has ', len(domain_dict)
+        if Apply_rule3:
+
+            if rule3_row(domain_dict,list_sud) :
+                Rule_3_Applied=True
+                #print "Applied Rule -3A"
+                continue
+            if rule3_column(domain_dict,list_sud):
+                Rule_3_Applied = True
+                #print "Applied Rule -3B"
+                continue
+            if rule3_box(domain_dict,list_sud):
+                Rule_3_Applied = True
+
+                continue
+
+
 
         #Applying Rule 4
-        naked_triples_row(domain_dict,list_sud,k)
-        domain_dict = update_domain(domain_dict, list_sud)
-        naked_triples_column(domain_dict,list_sud,k)
-        domain_dict = update_domain(domain_dict, list_sud)
-        naked_triples_box(domain_dict, list_sud, k)
-        domain_dict = update_domain(domain_dict, list_sud)
-        print 'After Naked Triples domain dictionary has ', len(domain_dict)
-        print_sudoku(list_sud)
-        show_domain(domain_dict)
+        if Apply_rule4:
+            if naked_triples_row(domain_dict,list_sud,k):
+                Rule_4_Applied = True
+
+                continue
+            if naked_triples_column(domain_dict,list_sud,k):
+                Rule_4_Applied = True
+
+                continue
+            if naked_triples_box(domain_dict, list_sud, k):
+                Rule_4_Applied = True
+
+                continue
 
 
-        #domain_dict=update_domain(domain_dict,list_sud)
-
-        if check:
-            if domain_dict=={}:
-                return True
-
-            else:
-                show_domain(domain_dict)
-                return solve_sudoku_search(list(list_sud),domain_dict)
+        Search_solved = True
+        return [solve_sudoku_search(list(list_sud),domain_dict),True,Rule_2_Applied,Rule_3_Applied,Rule_4_Applied,Search_solved]
 
 
 
@@ -404,24 +419,29 @@ def find_domain(l,list_sud,vals):
 
 
 
-
-
-
-
-
-
-def find_empty_location(list_sud, l):
+def find_empty_location(list_sud):
     for row in range(9):
         for col in range(9):
             if (list_sud[row][col] == 0):
-                l[0] = row
-                l[1] = col
-                return True
-    return False
+                return [row,col]
+    return None
 
 
-# Returns a boolean which indicates whether any assigned entry
-# in the specified row matches the given number.
+
+def find_most_constrainted_location(domain_dict, list_sud):
+    resultDomain = range(1,100) # a big number, domain sizes only go up to 9
+    resultIndices = None
+    for row in range(9):
+        for col in range(9):
+            if (list_sud[row][col] == 0):
+                if len(resultDomain) > len(domain_dict[row,col]):
+                    resultDomain = domain_dict[row,col]
+                    resultIndices = [row, col]
+    return resultIndices
+
+
+
+
 def used_in_row(list_sud, row, num):
     for i in range(9):
         if (list_sud[row][i] == num):
@@ -429,8 +449,6 @@ def used_in_row(list_sud, row, num):
     return False
 
 
-# Returns a boolean which indicates whether any assigned entry
-# in the specified column matches the given number.
 def used_in_col(list_sud, col, num):
     for i in range(9):
         if (list_sud[i][col] == num):
@@ -438,8 +456,7 @@ def used_in_col(list_sud, col, num):
     return False
 
 
-# Returns a boolean which indicates whether any assigned entry
-# within the specified 3x3 box matches the given number
+
 def used_in_box(list_sud, row, col, num):
     for i in range(3):
         for j in range(3):
@@ -448,12 +465,8 @@ def used_in_box(list_sud, row, col, num):
     return False
 
 
-# Checks whether it will be legal to assign num to the given row,col
-# Returns a boolean which indicates whether it will be legal to assign
-# num to the given row,col location.
+
 def check_location_is_safe(list_sud, row, col, num):
-    # Check if 'num' is not already placed in current row,
-    # current column and current 3x3 box
     return not used_in_row(list_sud, row, num) and not used_in_col(list_sud, col, num) and not used_in_box(list_sud, row - row % 3,
                                                                                                  col - col % 3, num)
 
@@ -462,11 +475,13 @@ def solve_sudoku_search(list_sud,domain_dict):
     # 'l' is a list variable that keeps the record of row and col in find_empty_location Function
     l = [0, 0]
     global back_tracking_count
-
+    #print 'I am here'
 
 
     # If there is no unassigned location, we are done
-    if (not find_empty_location(list_sud, l)):
+    l = find_most_constrainted_location(domain_dict,list_sud)
+    #l = find_empty_location(list_sud)
+    if (not l):
         return True
 
     # Assigning list values to row and col that we got from the above Function
@@ -507,8 +522,18 @@ if __name__ == "__main__":
         data_dict = {}
         count=0
         temp_data = []
+        type_of_problem = {}
         for line in lines:
             if 'easy' in line or 'medium' in line or 'hard' in line  or 'evil' in line:
+                if 'easy' in line:
+                    type_of_problem[count] = 'easy'
+                if 'medium' in line:
+                    type_of_problem[count] = 'medium'
+                if 'hard' in line:
+                    type_of_problem[count] = 'hard'
+                if 'evil' in line:
+                    type_of_problem[count] = 'evil'
+
 
                 data_dict[count]=np.array(temp_data)
                 count+=1
@@ -521,13 +546,16 @@ if __name__ == "__main__":
     del data_dict[0]
 
     #print data_dict
-    for key in [27]:
+    print 'Problem No.'+'\t'+'Problem_type'+'\t'+'K'+'\t'+'Solved'+'\t'+'Rule_1\tRule_2\tRule_3\t_Rule_4\tSearch\tBack_Tracks'
 
+    for key in data_dict.keys():
+        #if key==27:
+        #    continue
         domain_dict={}
 
-        print key
+        #print key
 
-        print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+        #print '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
         list_sud =data_dict[key]
         #print_sudoku(list_sud)
         back_tracking_count = 0
@@ -535,23 +563,10 @@ if __name__ == "__main__":
 
 
         result = constraint_propogation(domain_dict, list_sud, k)
-        print "Problem =\t",key, "\tSolved=\t", result, "\tBacktracks\t", back_tracking_count
-        print_sudoku(list_sud)
-        print domain_dict
-        # #naked_triples(domain_dict,list_sud,3)
-        # #show_domain(domain_dict)
-        # print 'None applied '
-        # print_sudoku(list_sud)
-        # #rule3_row(domain_dict,list_sud)
-        # #print 'row'
-        # #print_sudoku(list_sud)
-        #
-        # #rule3_column(domain_dict,list_sud)
-        # #print 'column'
-        # #print_sudoku(list_sud)
-        # print 'box'
-        # rule3_box(domain_dict,list_sud)
-        # print_sudoku(list_sud)
-        # #update_domain(domain_dict,list_sud)
-        # #solve_sudoku_search(list_sud,domain_dict)
-        # ##print key,constraint_propogation(domain_dict,list_sud), back_tracking_count
+        #print "Problem =\t",key, "\tSolved=\t", result, "\tBacktracks\t", back_tracking_count
+
+
+        print key,'\t',type_of_problem[key],'\t',k,'\t',result[0],'\t',result[1],'\t',result[2],'\t',result[3],'\t',result[4],'\t',result[5],'\t',back_tracking_count
+        #[solve_sudoku_search(list(list_sud), domain_dict), True, Rule_2_Applied, Rule_3_Applied, Rule_4_Applied,Search_solved]
+
+

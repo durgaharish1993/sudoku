@@ -1,0 +1,86 @@
+/usr/bin/python /Users/dimbul/Desktop/destop_v1/OSU/Term-2_winter_2017/AI_Projects/Suduko_v3/sudoku/main.py
+#Applied only Rule 1
+#find_most_constrainted_location
+
+
+Problem No.	Problem_type	K	Solved	Rule_1	Rule_2	Rule_3	_Rule_4	Search	Back_Tracks
+1 	medium 	3 	True 	True 	False 	False 	False 	True 	136
+2 	hard 	3 	True 	True 	False 	False 	False 	True 	545
+3 	evil 	3 	True 	True 	False 	False 	False 	True 	1608
+4 	easy 	3 	True 	True 	False 	False 	False 	True 	11851
+5 	easy 	3 	True 	True 	False 	False 	False 	True 	263
+6 	easy 	3 	True 	True 	False 	False 	False 	True 	107
+7 	medium 	3 	True 	True 	False 	False 	False 	True 	59
+8 	evil 	3 	True 	True 	False 	False 	False 	True 	72291
+9 	medium 	3 	True 	True 	False 	False 	False 	True 	743
+10 	hard 	3 	True 	True 	False 	False 	False 	True 	1277
+11 	hard 	3 	True 	True 	False 	False 	False 	True 	1429
+12 	hard 	3 	True 	True 	False 	False 	False 	True 	12090
+13 	evil 	3 	True 	True 	False 	False 	False 	True 	673837
+14 	evil 	3 	True 	True 	False 	False 	False 	True 	26057
+15 	evil 	3 	True 	True 	False 	False 	False 	True 	44904
+16 	easy 	3 	True 	True 	False 	False 	False 	True 	378
+17 	easy 	3 	True 	True 	False 	False 	False 	True 	125
+18 	easy 	3 	True 	True 	False 	False 	False 	True 	176
+19 	easy 	3 	True 	True 	False 	False 	False 	True 	91
+20 	medium 	3 	True 	True 	False 	False 	False 	True 	24
+21 	medium 	3 	True 	True 	False 	False 	False 	True 	23987
+22 	medium 	3 	True 	True 	False 	False 	False 	True 	3876
+23 	medium 	3 	True 	True 	False 	False 	False 	True 	2776
+24 	evil 	3 	True 	True 	False 	False 	False 	True 	2928
+25 	hard 	3 	True 	True 	False 	False 	False 	True 	500
+26 	evil 	3 	True 	True 	False 	False 	False 	True 	287607
+27 	evil 	3 	True 	True 	False 	False 	False 	True 	59387
+28 	easy 	3 	True 	True 	False 	False 	False 	True 	49320
+29 	easy 	3 	True 	True 	False 	False 	False 	True 	418
+30 	medium 	3 	True 	True 	False 	False 	False 	True 	347
+31 	hard 	3 	True 	True 	False 	False 	False 	True 	2918
+32 	hard 	3 	True 	True 	False 	False 	False 	True 	104238
+33 	evil 	3 	True 	True 	False 	False 	False 	True 	16133
+34 	medium 	3 	True 	True 	False 	False 	False 	True 	85746
+35 	medium 	3 	True 	True 	False 	False 	False 	True 	39
+36 	hard 	3 	True 	True 	False 	False 	False 	True 	490
+37 	hard 	3 	True 	True 	False 	False 	False 	True 	3634
+38 	evil 	3 	True 	True 	False 	False 	False 	True 	41529
+39 	evil 	3 	True 	True 	False 	False 	False 	True 	3551
+40 	easy 	3 	True 	True 	False 	False 	False 	True 	243
+41 	easy 	3 	True 	True 	False 	False 	False 	True 	64
+42 	easy 	3 	True 	True 	False 	False 	False 	True 	182
+43 	easy 	3 	True 	True 	False 	False 	False 	True 	98
+44 	medium 	3 	True 	True 	False 	False 	False 	True 	32
+45 	medium 	3 	True 	True 	False 	False 	False 	True 	95
+46 	hard 	3 	True 	True 	False 	False 	False 	True 	238
+47 	evil 	3 	True 	True 	False 	False 	False 	True 	9823
+48 	easy 	3 	True 	True 	False 	False 	False 	True 	24233
+49 	easy 	3 	True 	True 	False 	False 	False 	True 	109
+50 	evil 	3 	True 	True 	False 	False 	False 	True 	2
+51 	evil 	3 	True 	True 	False 	False 	False 	True 	8472
+52 	hard 	3 	True 	True 	False 	False 	False 	True 	81599
+53 	medium 	3 	True 	True 	False 	False 	False 	True 	31745
+54 	easy 	3 	True 	True 	False 	False 	False 	True 	3683
+55 	medium 	3 	True 	True 	False 	False 	False 	True 	71
+56 	medium 	3 	True 	True 	False 	False 	False 	True 	3487
+57 	hard 	3 	True 	True 	False 	False 	False 	True 	1218
+58 	hard 	3 	True 	True 	False 	False 	False 	True 	1562
+59 	evil 	3 	True 	True 	False 	False 	False 	True 	10784
+60 	easy 	3 	True 	True 	False 	False 	False 	True 	295688
+61 	easy 	3 	True 	True 	False 	False 	False 	True 	11
+62 	medium 	3 	True 	True 	False 	False 	False 	True 	680
+63 	medium 	3 	True 	True 	False 	False 	False 	True 	1199
+64 	hard 	3 	True 	True 	False 	False 	False 	True 	5147
+65 	hard 	3 	True 	True 	False 	False 	False 	True 	1834
+66 	easy 	3 	True 	True 	False 	False 	False 	True 	1367
+67 	easy 	3 	True 	True 	False 	False 	False 	True 	427
+68 	easy 	3 	True 	True 	False 	False 	False 	True 	444
+69 	easy 	3 	True 	True 	False 	False 	False 	True 	303
+70 	medium 	3 	True 	True 	False 	False 	False 	True 	62
+71 	medium 	3 	True 	True 	False 	False 	False 	True 	7999
+72 	medium 	3 	True 	True 	False 	False 	False 	True 	181366
+73 	medium 	3 	True 	True 	False 	False 	False 	True 	37101
+74 	hard 	3 	True 	True 	False 	False 	False 	True 	134492
+75 	hard 	3 	True 	True 	False 	False 	False 	True 	39568
+76 	hard 	3 	True 	True 	False 	False 	False 	True 	159829
+77 	hard 	3 	True 	True 	False 	False 	False 	True 	90184
+78 	hard 	3 	True 	True 	False 	False 	False 	True 	5124
+
+Process finished with exit code 0
